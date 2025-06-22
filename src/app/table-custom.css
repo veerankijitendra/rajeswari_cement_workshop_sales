@@ -1,0 +1,25 @@
+:root {
+  --table-bg: #fff7ed;
+  --header-bg: #fed7aa;
+  --header-text: #7c2d12;
+  --row-hover: #ffedd5;
+  --border-color: #fdba74;
+}
+
+.table-custom {
+  background: var(--table-bg);
+  border: 1px solid var(--border-color);
+}
+.table-custom thead {
+  background: var(--header-bg);
+}
+.table-custom th {
+  color: var(--header-text);
+}
+.table-custom tr:hover {
+  background: var(--row-hover);
+}
+.table-custom td, .table-custom th {
+  border-top: 1px solid var(--border-color);
+  color: var(--color-cyprus);
+}
