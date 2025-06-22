@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown, X } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
@@ -141,18 +141,13 @@ const SalesForm: React.FC = () => {
   });
 
 
-  const getStock = (value: string) => {
-   
-
-  }
-
   const error = () => Object.values(errors).length > 0 ? Object.values(errors)[0]?.message : ""
 
   return (
     <div className="h-full sm:h-auto overflow-auto p-4">
       <form
         className="grid grid-cols-1 gap-4 relative"
-        onSubmit={handleSubmit((data) => {})}
+        onSubmit={handleSubmit(() => {})}
       >
         {/* <X size={16} className="absolute right-1 top-1 text-sm" /> */}
         <h1 className="text-2xl font-semibold underline underline-offset-2">

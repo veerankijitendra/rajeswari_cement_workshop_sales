@@ -1,4 +1,4 @@
-import { Schema, model, models, Document } from "mongoose";
+import { Schema, model, models } from "mongoose";
 import { IMaterial } from "../types";
 import { MaterailEnum } from "../resource";
 

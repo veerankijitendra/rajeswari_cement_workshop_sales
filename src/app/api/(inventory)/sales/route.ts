@@ -80,7 +80,7 @@ export const GET = async (request: Request) => {
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch sales data" },
+      { error: "Failed to fetch sales data", errors: JSON.stringify(error) },
       { status: 500 }
     );
   }

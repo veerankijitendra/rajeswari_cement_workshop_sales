@@ -4,8 +4,7 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    let { materials } = body;
-
+    const { materials } = body;
 
     if (!Array.isArray(materials) || materials.length === 0) {
       return NextResponse.json(
@@ -14,17 +13,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate each material object
-    // for (const material of materials) {
-    //   if (!material.name || !material.quantity || !material.unitPrice) {
-    //     return NextResponse.json(
-    //       { error: "Each material must have name, quantity, and unitPrice" },
-    //       { status: 400 }
-    //     );
-    //   }
-    // }
-
-    // Insert materials into the database
     const insertedMaterials = await Material.insertMany(materials);
 
     return NextResponse.json({
@@ -37,21 +25,10 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE() {
   try {
-    const body = await request.json();
-    const { ids } = body;
 
-    // if (!Array.isArray(ids) || ids.length === 0) {
-    //   return NextResponse.json(
-    //     { error: "Invalid or empty ids array" },
-    //     { status: 400 }
-    //   );
-    // }
-
-    // Delete materials by IDs
     const deletedMaterials = await Material.deleteMany({
-    //   _id: { $in: ids },
     });
 
     return NextResponse.json({
@@ -59,7 +36,6 @@ export async function DELETE(request: Request) {
       data: deletedMaterials,
     });
   } catch (error) {
-    console.log("Error in DELETE /api/inventory/materials/bulk:", error);
-    return NextResponse.json({ error: "Failed to process request" });
+    return NextResponse.json({ error: "Failed to process request", errors: JSON.stringify(error) });
   }
 }

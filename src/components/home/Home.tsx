@@ -1,6 +1,5 @@
 "use client";
 import { useRouter } from "next/navigation";
-import {ModalDemo} from "./Modal";
 import Image from "next/image";
 
 

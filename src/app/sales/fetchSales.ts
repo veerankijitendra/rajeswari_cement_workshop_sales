@@ -6,10 +6,9 @@ export const fetchSales = async (
   try {
     console.log(page,per_page,search,"jitendra")
     const url = new URLSearchParams({});
-    page && url.set("page",page?.toString())
-    per_page && url.set("perPage",per_page?.toString())
-    search && url.set("search", search?.toString())
-    console.log(url?.toString())
+     if(page) url.set("page",page?.toString());
+    if(per_page) url.set("perPage",per_page?.toString());
+    if(search)  url.set("search", search?.toString());
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/sales?${url?.toString()}`,

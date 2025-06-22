@@ -13,24 +13,22 @@ import Pagination from "../home/Pagination";
 import { TSalesResponse, TSearchParams } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSales } from "@/app/sales/fetchSales";
-import { useSalesHistory } from "@/lib/store/material";
 import { useRouter } from "next/navigation";
-import { ArrowBigLeft, ArrowBigLeftIcon, ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 import { Button } from "../ui/button";
-interface IProps extends TSearchParams {}
+interface IProps extends TSearchParams {
+  data?: unknown
+}
 
 // Dummy sales data (replace with API call if needed
 
 const SalesTable = ({ page, per_page, search: query }: IProps) => {
   const [search, setSearch] = useState("");
 
-  const updateSalesHistory = useSalesHistory((state) => state.updateSales);
   const router = useRouter();
 
   const {
     data: response,
-    isLoading,
-    error,
   } = useQuery({
     queryKey: ["sales", page, per_page, query],
     queryFn: () => fetchSales({ page, per_page, search: query }),

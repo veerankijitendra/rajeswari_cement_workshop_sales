@@ -3,24 +3,22 @@
 import InventoryTable from "@/components/inventory/InventoryTable";
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useMaterialStore, useModelStore } from "@/lib/store/material";
 import NewMaterialForm from "./InventoryForm";
 import Modal from "../home/Modal";
-import { useSearchParams } from "next/navigation";
-import { TSearchParams } from "@/lib/types";
+import { TMaterialResponse, TSearchParams } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { fetchInventory } from "@/app/inventory/fetchInventory";
 import { ArrowLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 interface IProps extends TSearchParams {
-  // data: any;
+  data?: unknown;
 }
 
-function updateMaterialStore(data: any) {
+function updateMaterialStore(data: unknown) {
   if (!!data) {
     useMaterialStore.setState(() => ({
-      inventory: data,
+      inventory: data as TMaterialResponse,
     }));
   }
 }
@@ -34,7 +32,7 @@ const InventoryPage: React.FC<IProps> = ({ search, page, per_page }) => {
   // updateMaterialStore(data);
   const router = useRouter()
 
-  const { data, isLoading, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ["inventory", search, page, per_page],
     queryFn: () => fetchInventory({ search, page, per_page }),
   });
