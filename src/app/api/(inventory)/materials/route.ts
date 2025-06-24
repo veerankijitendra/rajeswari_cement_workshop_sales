@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectToDB from "@/lib/mongoose";
 import { materialSchema, MaterailEnum, SearchParamsEnum } from "@/lib/resource";
 import { TMaterialResponse } from "@/lib/types";
+import { PipelineStage } from "mongoose";
 
 export const GET = async (req: Request) => {
   try {
@@ -49,12 +50,12 @@ export const GET = async (req: Request) => {
       })
     }
 
-    const match: any = {
+    const match: unknown = {
       $match: andConditions.length > 0 ? {$and: andConditions}: {}
     };
 
     const materials = await Material.aggregate([
-        match,
+        match as PipelineStage,
       {
         $facet: {
           data: [

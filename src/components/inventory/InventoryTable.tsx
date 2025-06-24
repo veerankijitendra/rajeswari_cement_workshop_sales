@@ -214,20 +214,18 @@ export default function InventoryTable() {
             return (
               <TableRow
                 key={row.id}
-                // className="hover:bg-gray-50 transition-colors"
               >
                 {row.getVisibleCells().map((cell) => {
                   const isPrice = [
                     MaterailEnum.PRICE,
                     MaterailEnum.SELL_PRICE,
                     MaterailEnum.TOTAL_PRICE,
-                    // @ts-ignore
+                   // @ts-expect-error - this value might be undefined in edge cases
                   ].includes(cell.column.columnDef.accessorKey);
 
                   return (
                     <TableCell
                       key={cell.id}
-                      // className="px-4 py-2 border-t border-gray-200"
                       data-object-id={JSON.stringify(cell.row.original)}
                     >
                       {`${isPrice ? "₹" : ""}`}
