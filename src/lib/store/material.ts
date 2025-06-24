@@ -54,22 +54,17 @@ export const useSingleMaterialStore = create<ISingleMaterialState>((set) => ({
 
 interface ILandingPage {
   open: boolean;
-  toggleModel: () => void;
   content: React.ReactElement | null;
   openModel: (conent: React.ReactElement) => void;
   closeModel: () => void;
-  updateContent: (content: React.ReactElement) => void;
 }
 
 export const useModelStore = create<ILandingPage>((set) => ({
   open: false,
-  toggleModel: () => {
-    set((state) => ({ open: !state.open }));
-  },
   content: null,
-  updateContent: (content) => set(() => ({ content })),
   openModel: (content) => {
     set({ content, open: true });
   },
-  closeModel: () => set({ content: null, open: false }),
+  closeModel: () => {
+    set({ content: null, open: false })},
 }));

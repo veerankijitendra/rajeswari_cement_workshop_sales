@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       data: insertedMaterials,
     });
   } catch (error) {
-    console.log("Error in POST /api/inventory/materials/bulk:", error);
+    console.error("Error in POST /api/inventory/materials/bulk:", error);
     return NextResponse.json({ error: "Failed to process request" });
   }
 }

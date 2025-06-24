@@ -130,3 +130,11 @@
 h1, h2, h3, h4, h5, h6, p {
   color: #112A46;
 }
+
+.btn-primary{
+  @apply bg-white text-cyprus outline-[.5px] outline-cyprus/70;
+}
+
+.btn-secondary {
+  @apply bg-cyprus text-white;
+}

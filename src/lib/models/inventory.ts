@@ -3,24 +3,24 @@ import { IMaterial } from "../types";
 import { MaterailEnum } from "../resource";
 
 
-const MaterialSchema = new Schema<IMaterial>({
+const MaterialSchema = new Schema({
     [MaterailEnum.MATERIAL_NAME]: {
         type: String,
         required: true,
         minlength: 3,
     },
     [MaterailEnum.PRICE]: {
-        type: String,
+        type: Number,
         required: true,
         min: 0,
     },
     [MaterailEnum.SELL_PRICE]: {
-        type:  String,
+        type:  Number,
         required: true,
         min: 0,
     },
     [MaterailEnum.STOCK]: {
-        type: String,
+        type: Number,
         required: true,
         min: 0,
     },

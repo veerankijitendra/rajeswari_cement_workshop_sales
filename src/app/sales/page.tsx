@@ -25,7 +25,7 @@ const SalesPage = async (params: { searchParams: Promise<TSearchParams> }) => {
     });
     dehydratedData = dehydrate(queryClient);
   } catch (error) {
-    console.log("Failed to fetch the data", error);
+    console.error("Failed to fetch the data", error);
   }
 
   return (

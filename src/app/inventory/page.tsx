@@ -21,7 +21,7 @@ const Inventory: React.FC = async (props: {
   const parsedData = searchParamsSchema.safeParse(searchParams);
 
   if (!parsedData.success) redirect("/inventory");
-  const { page, per_page, search } = parsedData.data;
+  const { page, per_page, search, category } = parsedData.data;
 
   try {
     await queryClient.prefetchQuery({
@@ -31,12 +31,12 @@ const Inventory: React.FC = async (props: {
 
     dehydratedState = dehydrate(queryClient);
   } catch (error) {
-    console.log("Failed to prefetch the inventory ", error);
+    console.error("Failed to prefetch the inventory ", error);
   }
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <InventoryPage search={search} page={page} per_page={per_page} />
+      <InventoryPage search={search} page={page} per_page={per_page} category={category} />
     </HydrationBoundary>
   );
 };

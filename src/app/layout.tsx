@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${font.className} bg-gray-100`}>
         <Providers>
-          <div className="max-w-6xl mx-auto w-svw">
+          <div className="max-w-6xl mx-auto w-full">
             {children}
           </div>
           <Toaster />

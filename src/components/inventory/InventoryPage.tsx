@@ -9,7 +9,7 @@ import Modal from "../home/Modal";
 import { TMaterialResponse, TSearchParams } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { fetchInventory } from "@/app/inventory/fetchInventory";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, } from "lucide-react";
 import { useRouter } from "next/navigation";
 interface IProps extends TSearchParams {
   data?: unknown;
@@ -23,18 +23,16 @@ function updateMaterialStore(data: unknown) {
   }
 }
 
-const InventoryPage: React.FC<IProps> = ({ search, page, per_page }) => {
+const InventoryPage: React.FC<IProps> = ({ search, page, per_page, category }) => {
   const content = useModelStore((state) => state.content);
-  const open = useModelStore((state) => state.open);
-  // const toogleModal = useModelStore(state => state.toggleModel)
   const openModel = useModelStore((state) => state.openModel);
   const closeModel = useModelStore((state) => state.closeModel);
-  // updateMaterialStore(data);
-  const router = useRouter()
+  const open = useModelStore(state => state.open)
+  const router = useRouter();
 
   const { data } = useQuery({
     queryKey: ["inventory", search, page, per_page],
-    queryFn: () => fetchInventory({ search, page, per_page }),
+    queryFn: () => fetchInventory({ search, page, per_page, category }),
   });
 
   useEffect(() => {
@@ -52,7 +50,7 @@ const InventoryPage: React.FC<IProps> = ({ search, page, per_page }) => {
       <Modal isOpen={open} onClose={closeModel}>
         {content}
       </Modal>
-      <div className="p-2 w-full overflow-x-clip h-svh flex flex-col">
+      <div className="p-2 w-full overflow-x-clip flex flex-col">
         <div className="flex gap-4 items-center py-4 justify-between flex-wrap">
           <div className="flex items-center gap-4 justify-between">
             <Button variant={"outline"} onClick={handleBack}>
@@ -60,11 +58,9 @@ const InventoryPage: React.FC<IProps> = ({ search, page, per_page }) => {
             </Button>
             <h1 className="text-xl sm:text-3xl font-bold">Inventory</h1>
           </div>
-          {/* <Link href="/inventory/new" className="inline-block"> */}
-          <Button className="" onClick={handleNewItem}>
+          <Button className="btn-secondary" onClick={handleNewItem}>
             Add New Item
           </Button>
-          {/* </Link> */}
         </div>
         <InventoryTable />
       </div>

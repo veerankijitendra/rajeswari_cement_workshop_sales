@@ -196,8 +196,6 @@ export const DELETE = async (request: Request) => {
     const { searchParams } = new URL(request.url);
     const salesId = searchParams.get("id");
 
-    console.log("Deleting sale with ID:", salesId);
-
     if (!salesId) {
       return NextResponse.json(
         { error: "Sales ID is required" },
@@ -211,8 +209,6 @@ export const DELETE = async (request: Request) => {
     }
 
     const sale = await Sales.findOneAndDelete({ _id: salesId });
-
-    console.log("Sale found:", sale);
 
     if (!sale) {
       return NextResponse.json(

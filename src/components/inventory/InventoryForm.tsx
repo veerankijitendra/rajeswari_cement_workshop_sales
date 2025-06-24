@@ -1,11 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import { toast } from "sonner"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MaterailEnum, materialSchema } from "@/lib/resource";
 import { TFormMaterialInput } from "@/lib/types";
-import { toast } from "sonner"
+import { Button } from "../ui/button";
+import { postMaterial } from "@/app/inventory/fetchInventory";
+import {useModelStore} from "@/lib/store/material"
 
 const initialState: TFormMaterialInput = {
   [MaterailEnum.MATERIAL_NAME]: "",
@@ -22,11 +27,30 @@ interface IProps {
 }
 
 export default function NewMaterialForm({material}: IProps) {
-
   const [form, setForm] = useState<TFormMaterialInput>(!!material ? material : initialState);
   const [errors, setErrors] = useState<
     Partial<Record<keyof TFormMaterialInput, string>>
   >({});
+
+  const queryClient = useQueryClient()
+
+  const closeModel = useModelStore((state) => state.closeModel)
+
+  const mutation = useMutation({
+    mutationFn: postMaterial,
+    onSuccess: () => {
+      closeModel()
+      queryClient.invalidateQueries({queryKey: ["inventory"],})
+
+      useModelStore.setState({open: false, content: null})
+      setForm(initialState);
+      toast.success("Material added successfully!",{position:"top-center"})
+
+    },
+    onError: () => {
+      toast.error("Failed", {position:"top-center"})
+    }
+  })
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -52,36 +76,17 @@ export default function NewMaterialForm({material}: IProps) {
     }
     setErrors({});
 
-   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/materials`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    })
+    mutation.mutate({material:form, isEdit:!!material})
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Error adding material:", errorData);
-      toast.error("Failed to add material: " + errorData.message || "Unknown error");
-
-      return;
-    }
-    const data = await response.json();
-
-    setForm(initialState)
-    toast.success("Material added successfully!",)
-
-    console.log("Material added successfully:", data);
 
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="h-full sm:h-auto overflow-auto max-w-md mx-auto mt-8 flex flex-col gap-4 bg-white p-6 rounded-lg shadow"
+      className="h-full sm:h-auto overflow-auto max-w-md mx-auto mt-8 flex flex-col gap-4 p-6 rounded-lg"
     >
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="materialName">Material Name</Label>
         <Input
           id="materialName"
@@ -96,13 +101,13 @@ export default function NewMaterialForm({material}: IProps) {
           <span className="text-red-500 text-sm">{errors.materialName}</span>
         )}
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="price">Price</Label>
         <Input
           id="price"
           type="text"
           name="price"
-          value={form.price}
+          value={`${form.price}`}
           onChange={handleChange}
           placeholder="Enter price"
           required
@@ -111,13 +116,13 @@ export default function NewMaterialForm({material}: IProps) {
           <span className="text-red-500 text-sm">{errors.price}</span>
         )}
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="sellPrice">Sell Price</Label>
         <Input
           id="sellPrice"
           type="text"
           name="sellPrice"
-          value={form.sellPrice}
+          value={`${form.sellPrice}`}
           onChange={handleChange}
           placeholder="Enter sell price"
           required
@@ -126,13 +131,13 @@ export default function NewMaterialForm({material}: IProps) {
           <span className="text-red-500 text-sm">{errors.sellPrice}</span>
         )}
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="stock">Stock</Label>
         <Input
           id="stock"
           type="text"
           name="stock"
-          value={form.stock}
+          value={`${form.stock}`}
           onChange={handleChange}
           placeholder="Enter stock quantity"
           required
@@ -141,7 +146,7 @@ export default function NewMaterialForm({material}: IProps) {
           <span className="text-red-500 text-sm">{errors.stock}</span>
         )}
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="stockUnits">Stock Units</Label>
         <select
           id="stockUnits"
@@ -159,7 +164,7 @@ export default function NewMaterialForm({material}: IProps) {
           <span className="text-red-500 text-sm">{errors.stockUnits}</span>
         )}
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="category">Category</Label>
         <select
           id="category"
@@ -177,12 +182,12 @@ export default function NewMaterialForm({material}: IProps) {
           <span className="text-red-500 text-sm">{errors.category}</span>
         )}
       </div>
-      <button
+      <Button
         type="submit"
-        className="mt-2 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+        className="btn-secondary"
       >
         {!!material ? "Edit" : "Add"} Material
-      </button>
+      </Button>
     </form>
   );
 }

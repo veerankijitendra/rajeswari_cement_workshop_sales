@@ -4,7 +4,6 @@ export const fetchSales = async (
  {page,per_page,search}:TSearchParams
 ): Promise<unknown> => {
   try {
-    console.log(page,per_page,search,"jitendra")
     const url = new URLSearchParams({});
      if(page) url.set("page",page?.toString());
     if(per_page) url.set("perPage",per_page?.toString());

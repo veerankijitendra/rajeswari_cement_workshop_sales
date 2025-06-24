@@ -22,4 +22,5 @@
 .table-custom td, .table-custom th {
   border-top: 1px solid var(--border-color);
   color: var(--color-cyprus);
+  padding: .5rem;
 }

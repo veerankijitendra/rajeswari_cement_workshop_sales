@@ -9,17 +9,17 @@ if (!MONGODB_URI) {
 async function dbConnect() {
   const readyState = mongoose.connection.readyState;
   if (readyState == 1) {
-    console.log("MongoDB is already connected");
+    console.info("MongoDB is already connected");
     return;
   }
 
   if (readyState == 2) {
-    console.log("MongoDB is currently connecting");
+    console.info("MongoDB is currently connecting");
   }
 
   try {
     await mongoose.connect(MONGODB_URI);
-    console.log("MongoDB connected successfully");
+    console.info("MongoDB connected successfully");
   } catch (error) {
     console.error("MongoDB connection error:", error);
     throw new Error("Failed to connect to MongoDB");

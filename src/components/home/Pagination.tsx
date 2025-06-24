@@ -27,17 +27,11 @@ const Pagination: React.FC<PaginationProps> = ({
         if (canNext) onPageChange(page + 1);
     };
 
-    // Helper to generate page numbers (simple version, shows all pages)
     const getPageNumbers = () => {
         return Array.from({ length: pageCount }, (_, i) => i + 1);
     };
 
-    const handleResize = () => {
-        setIsMobileScreen(window.innerWidth <= 500 ? true : false)
-
-        console.log("jitendra",window.innerWidth)
-
-    }
+    const handleResize = () => setIsMobileScreen(window.innerWidth <= 500 ? true : false)  
 
     React.useEffect(()=>{
         handleResize()

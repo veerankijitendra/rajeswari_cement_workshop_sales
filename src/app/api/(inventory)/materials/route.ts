@@ -1,8 +1,7 @@
 import Material from "@/lib/models/inventory";
 import { NextRequest, NextResponse } from "next/server";
 import connectToDB from "@/lib/mongoose";
-import { materialSchema } from "@/lib/resource";
-import { MaterailEnum } from "@/lib/resource";
+import { materialSchema, MaterailEnum, SearchParamsEnum } from "@/lib/resource";
 import { TMaterialResponse } from "@/lib/types";
 
 export const GET = async (req: Request) => {
@@ -15,23 +14,51 @@ export const GET = async (req: Request) => {
     const { searchParams } = new URL(req.url);
 
 
-    const materialName = searchParams.get(MaterailEnum.MATERIAL_NAME) ?? "";
+    const search = searchParams.get(SearchParamsEnum.SEARCH) ?? "";
+    const category = searchParams.getAll(SearchParamsEnum.CATEGORY);
 
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const perPage = parseInt(searchParams.get("perPage") || "10", 10);
+    const categoryArray = Array.isArray(category) ? category : category ? [category] : []
 
-    console.log("jitendra==>",page,perPage, searchParams.get("page"))
+    const page = parseInt(searchParams.get(SearchParamsEnum.PAGE) || "1", 10);
+    const perPage = parseInt(searchParams.get(SearchParamsEnum.PER_PAGE) || "10", 10);
+
+    const andConditions = []
+
+    if(search) {
+      andConditions.push({
+                  $or: [
+                    {
+                      [MaterailEnum.CATEGORY]: {
+                        $regex: search,
+                        $options: "i",
+                      },
+                    },
+                    {
+                      [MaterailEnum.MATERIAL_NAME]: {
+                        $regex: search,
+                        $options: "i",
+                      },
+                    },
+                  ],
+                },)
+    }
+
+    if(categoryArray.length > 0) {
+      andConditions.push({
+         [MaterailEnum.CATEGORY]: { $in: categoryArray } 
+      })
+    }
+
+    const match: any = {
+      $match: andConditions.length > 0 ? {$and: andConditions}: {}
+    };
 
     const materials = await Material.aggregate([
+        match,
       {
         $facet: {
           data: [
-            { $sort: { createdAt: -1 } },
-            { $match: { 
-              $or: [
-                {[MaterailEnum.MATERIAL_NAME]: { $regex: materialName, $options: "i" },}
-              ]
-            }},
+            { $sort: { createdAt: 1 } },
             {
               $project: {
                 _id: 0,
@@ -42,6 +69,7 @@ export const GET = async (req: Request) => {
                 [MaterailEnum.STOCK]: 1,
                 [MaterailEnum.STOCK_UNITS]: 1,
                 [MaterailEnum.CATEGORY]: 1,
+                [MaterailEnum.TOTAL_PRICE]: {$multiply: [`$${MaterailEnum.PRICE}`, `$${MaterailEnum.STOCK}`]}
               },
             },
             {
@@ -105,7 +133,7 @@ export const POST = async (request: NextRequest) => {
   try {
     const body = await request.json();
     const parsedBody = materialSchema.safeParse(body);
-    console.log("Parsed body:", parsedBody);
+
     if (!parsedBody.success) {
       return new NextResponse(JSON.stringify({ error: parsedBody.error }), {
         status: 400,
@@ -118,6 +146,9 @@ export const POST = async (request: NextRequest) => {
     if (!Material.db || !Material.db.readyState) {
       throw new Error("Database connection is not established");
     }
+
+    body[MaterailEnum.PRICE] = parseFloat( parsedBody?.data[MaterailEnum.PRICE]?.toString());
+    body[MaterailEnum.STOCK] = parseFloat( parsedBody?.data[MaterailEnum.STOCK]?.toString());
 
     const newMaterial = new Material(body);
     const savedMaterial = await newMaterial.save();
