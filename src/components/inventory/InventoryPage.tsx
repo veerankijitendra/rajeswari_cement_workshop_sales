@@ -63,7 +63,7 @@ const InventoryPage: React.FC<IProps> = ({ search, page, per_page, category }) =
             Add New Item
           </Button>
         </div>
-        {!(isLoading || isFetching) && <InventoryTable />}
+        {!(isLoading || isFetching || isRefetching) && <InventoryTable />}
         <div className="grow">{(isFetching || isLoading) && <Loading />}</div>
       </div>
     </>

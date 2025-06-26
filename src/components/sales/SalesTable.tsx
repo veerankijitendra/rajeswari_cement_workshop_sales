@@ -31,7 +31,7 @@ const SalesTable = ({ page, per_page, search: query }: IProps) => {
     data: response,
   } = useQuery({
     queryKey: ["sales", page, per_page, query],
-    queryFn: () => fetchSales({ page, per_page, search: query, category: "" }),
+    queryFn: () => fetchSales({ page, per_page, search: query, category: [] }),
   });
 
   const getStoreData = () => {

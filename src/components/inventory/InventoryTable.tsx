@@ -101,7 +101,7 @@ export default function InventoryTable() {
       if(Array.isArray(category)) setSelectedCategory(category);
       if(typeof category === 'string') setSelectedCategory([category])
     }
-  },[page, pageCount])
+  },[page, pageCount, searchParams])
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
