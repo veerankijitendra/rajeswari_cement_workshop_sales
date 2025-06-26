@@ -8,6 +8,7 @@ const MaterialSchema = new Schema({
         type: String,
         required: true,
         minlength: 3,
+        unique: true,
     },
     [MaterailEnum.PRICE]: {
         type: Number,

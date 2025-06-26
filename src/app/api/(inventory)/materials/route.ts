@@ -5,6 +5,13 @@ import { materialSchema, MaterailEnum, SearchParamsEnum } from "@/lib/resource";
 import { TMaterialResponse } from "@/lib/types";
 import { PipelineStage } from "mongoose";
 
+const headers = {
+        "Content-Type": "application/json",
+        'Access-Control-Allow-Origin': '*', // ✅ Allow all origins (use specific domain in prod)
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }
+
 export const GET = async (req: Request) => {
   try {
     await connectToDB();
@@ -59,7 +66,7 @@ export const GET = async (req: Request) => {
       {
         $facet: {
           data: [
-            { $sort: { createdAt: 1 } },
+            { $sort: { createdAt: -1 } },
             {
               $project: {
                 _id: 0,
@@ -112,9 +119,7 @@ export const GET = async (req: Request) => {
 
     return new NextResponse(JSON.stringify(data), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
     });
   } catch (error) {
     console.error("Error fetching materials:", error);
@@ -122,9 +127,7 @@ export const GET = async (req: Request) => {
       JSON.stringify({ error: "Failed to fetch materials" }),
       {
         status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
       }
     );
   }
@@ -138,9 +141,7 @@ export const POST = async (request: NextRequest) => {
     if (!parsedBody.success) {
       return new NextResponse(JSON.stringify({ error: parsedBody.error }), {
         status: 400,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
       });
     }
     await connectToDB();
@@ -156,9 +157,7 @@ export const POST = async (request: NextRequest) => {
 
     return new NextResponse(JSON.stringify(savedMaterial), {
       status: 201,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
     });
   } catch (error) {
     console.error("Error creating material:", error);
@@ -166,9 +165,7 @@ export const POST = async (request: NextRequest) => {
       JSON.stringify({ error: "Failed to create material" }),
       {
         status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
       }
     );
   }
@@ -181,9 +178,7 @@ export const PUT = async (request: NextRequest) => {
     if (!parsedBody.success) {
       return new NextResponse(JSON.stringify({ error: parsedBody.error }), {
         status: 400,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers
       });
     }
 
@@ -194,9 +189,7 @@ export const PUT = async (request: NextRequest) => {
         JSON.stringify({ error: "Material ID is required" }),
         {
           status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers
         }
       );
     }
@@ -214,17 +207,13 @@ export const PUT = async (request: NextRequest) => {
     if (!updatedMaterial) {
       return new NextResponse(JSON.stringify({ error: "Material not found" }), {
         status: 404,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers
       });
     }
 
     return new NextResponse(JSON.stringify(updatedMaterial), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers
     });
   } catch (error) {
     console.error("Error updating material:", error);
@@ -232,9 +221,7 @@ export const PUT = async (request: NextRequest) => {
       JSON.stringify({ error: "Failed to update material" }),
       {
         status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
       }
     );
   }
@@ -250,9 +237,7 @@ export const DELETE = async (request: NextRequest) => {
         JSON.stringify({ error: "Material ID is required" }),
         {
           status: 400,
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers
         }
       );
     }
@@ -267,17 +252,13 @@ export const DELETE = async (request: NextRequest) => {
     if (!deletedMaterial) {
       return new NextResponse(JSON.stringify({ error: "Material not found" }), {
         status: 404,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers
       });
     }
 
     return new NextResponse(JSON.stringify(deletedMaterial), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers
     });
   } catch (error) {
     console.error("Error deleting material:", error);
@@ -285,10 +266,20 @@ export const DELETE = async (request: NextRequest) => {
       JSON.stringify({ error: "Failed to delete material" }),
       {
         status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers
       }
     );
   }
 };
+
+export async function OPTIONS() {
+  // Handle preflight request
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}

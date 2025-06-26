@@ -56,7 +56,7 @@ const InventoryPage: React.FC<IProps> = ({ search, page, per_page, category }) =
             <Button variant={"outline"} onClick={handleBack}>
               <ArrowLeftIcon size={24} />
             </Button>
-            <h1 className="text-xl sm:text-3xl font-bold">Inventory</h1>
+            <h1 className="text-xl sm:text-3xl font-bold">Material</h1>
           </div>
           <Button className="btn-secondary" onClick={handleNewItem}>
             Add New Item
