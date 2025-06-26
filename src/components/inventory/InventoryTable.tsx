@@ -1,6 +1,6 @@
 "use client";
 import "@/app/table-custom.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState,} from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   Table,
@@ -16,24 +16,28 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { TMaterialInput } from "@/lib/types";
-import { useRouter } from "next/navigation";
-import { MaterailEnum } from "@/lib/resource";
+import { useRouter, useSearchParams } from "next/navigation";
+import { MaterailEnum, SearchParamsEnum } from "@/lib/resource";
 import { useMaterialStore, useModelStore } from "@/lib/store/material";
 import { Button } from "../ui/button";
 import Modal from "../home/Modal";
 import NewMaterialForm from "./InventoryForm";
 import SalesForm from "../sales/SalesForm";
 import Pagination from "../home/Pagination";
-import { Menubar, MenubarTrigger } from "@radix-ui/react-menubar";
 import { Search, ChevronDown } from "lucide-react";
+import { Menubar } from "@radix-ui/react-menubar";
 import {
+  MenubarTrigger,
+  MenubarGroup,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
+  MenubarCheckboxItem,
+  
 } from "../ui/menubar";
 import { Input } from "../ui/input";
+
+const category =  ["plumber", "electrical", "carpentors"]
 
 const columns: ColumnDef<TMaterialInput>[] = [
   { accessorKey: MaterailEnum.MATERIAL_NAME, header: "Material Name" },
@@ -67,6 +71,7 @@ const columns: ColumnDef<TMaterialInput>[] = [
   },
 ];
 
+
 export default function InventoryTable() {
   const content = useModelStore((state) => state.content);
   const open = useModelStore((state) => state.open);
@@ -76,7 +81,27 @@ export default function InventoryTable() {
   const page = useMaterialStore((state) => state.inventory.page);
   const pageCount = useMaterialStore((state) => state.inventory.totalPages);
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  const previousSearchParams = useRef<string>("")
+
+  const [search,setSearch] = useState<string>("")
+  const [selectedCategory, setSelectedCategory] = useState<string[]>([])
   const [isSearchOpened, setIsSearchOpened] = useState<boolean>(false);
+
+  useEffect(() => {
+    const search = searchParams.get(SearchParamsEnum.SEARCH);
+    const category = searchParams.getAll(SearchParamsEnum.CATEGORY);
+    if(search){
+      setSearch(search)
+    }
+
+    if(category) {
+      if(Array.isArray(category)) setSelectedCategory(category);
+      if(typeof category === 'string') setSelectedCategory([category])
+    }
+  },[page, pageCount])
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -86,7 +111,7 @@ export default function InventoryTable() {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const router = useRouter();
+
 
   useEffect(() => {
     if (isSearchOpened) {
@@ -120,15 +145,57 @@ export default function InventoryTable() {
   };
 
   const updateURL = (newSearch: string, newPage: number) => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams?.toString());
     if (newSearch) params.set("search", newSearch);
     params.set("page", newPage.toString());
-    router.push(`/inventory?${params.toString()}`);
+    router.replace(`/inventory?${params.toString()}`);
   };
 
   const handlePageChange = (page: number) => {
-    updateURL("", page);
+    updateURL(search, page);
   };
+
+  const handleCheckBox = (value:string) => () => {
+    setSelectedCategory(categoryList => categoryList.includes(value) ? categoryList.filter(each =>  each!== value): [...categoryList,value])
+
+  }
+
+  const handleClosAutoFocus = () => {
+    const newParams = new URLSearchParams(searchParams?.toString())
+    newParams.delete(SearchParamsEnum.CATEGORY);
+    if(selectedCategory.length > 0) {
+      selectedCategory.forEach( each =>   
+        {newParams.append(SearchParamsEnum.CATEGORY, each)})
+    }
+
+  
+
+    if(previousSearchParams.current !== newParams?.toString()) {
+      newParams.set(SearchParamsEnum.PAGE, "1")
+      previousSearchParams.current = newParams?.toString();
+      router.replace(`/inventory?${newParams.toString()}`);
+
+    }
+  }
+
+  const handleSearchAutoFocus = () => {
+    const newParams = new URLSearchParams(searchParams?.toString());
+
+    if (search.trim().length > 0) {
+      newParams.set(SearchParamsEnum.SEARCH, search.trim());
+    }
+
+    if(search.trim().length === 0) newParams.delete(SearchParamsEnum.SEARCH);
+
+    if (previousSearchParams.current !== newParams?.toString()) {
+      newParams.set(SearchParamsEnum.PAGE, "1")
+      previousSearchParams.current = newParams?.toString();
+      router.replace(`/inventory?${newParams.toString()}`);
+    }
+  };
+
+  const handleSearchValueChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value);
+  
 
   const renderCategoryMenu = (name: string) => {
     return (
@@ -146,21 +213,19 @@ export default function InventoryTable() {
             )}
           </MenubarTrigger>
           {name === "Category" ? (
-            <MenubarContent className="min-w-fit">
-              <MenubarRadioGroup value="">
-                <MenubarRadioItem value="">All</MenubarRadioItem>
-                <MenubarRadioItem value="eletrical">Eletrical</MenubarRadioItem>
-                <MenubarRadioItem value="plumber">Plumber</MenubarRadioItem>
-                <MenubarRadioItem value="carpentors">
-                  Carpentors
-                </MenubarRadioItem>
-              </MenubarRadioGroup>
+            <MenubarContent className="min-w-fit" onCloseAutoFocus={handleClosAutoFocus}>
+              <MenubarGroup>
+                {category.map(cat => <MenubarCheckboxItem  onSelect={(e) => e.preventDefault()} checked={selectedCategory.includes(cat)} onCheckedChange={handleCheckBox(cat)} key={cat}>
+                  {cat}
+                  </MenubarCheckboxItem>)}
+              </MenubarGroup>
             </MenubarContent>
           ) : (
             <MenubarContent
               onCloseAutoFocus={(e) => {
                 e.preventDefault();
                 setIsSearchOpened(false);
+                handleSearchAutoFocus()
               }}
               className="min-w-fit p-0"
             >
@@ -171,6 +236,8 @@ export default function InventoryTable() {
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
+                  onChange={handleSearchValueChange}
+                  value={search}
                   ref={inputRef}
                 />
               </MenubarItem>

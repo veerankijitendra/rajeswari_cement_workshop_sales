@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchInventory } from "@/app/inventory/fetchInventory";
 import { ArrowLeftIcon, } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Loading from "../Loader";
 interface IProps extends TSearchParams {
   data?: unknown;
 }
@@ -30,8 +31,8 @@ const InventoryPage: React.FC<IProps> = ({ search, page, per_page, category }) =
   const open = useModelStore(state => state.open)
   const router = useRouter();
 
-  const { data } = useQuery({
-    queryKey: ["inventory", search, page, per_page],
+  const { data, isLoading, isFetching, isRefetching } = useQuery({
+    queryKey: ["inventory", search, page, per_page, category],
     queryFn: () => fetchInventory({ search, page, per_page, category }),
   });
 
@@ -62,7 +63,8 @@ const InventoryPage: React.FC<IProps> = ({ search, page, per_page, category }) =
             Add New Item
           </Button>
         </div>
-        <InventoryTable />
+        {!(isLoading || isFetching) && <InventoryTable />}
+        <div className="grow">{(isFetching || isLoading) && <Loading />}</div>
       </div>
     </>
   );

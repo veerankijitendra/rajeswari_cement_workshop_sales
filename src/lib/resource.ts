@@ -117,5 +117,9 @@ export const searchParamsSchema = z.object({
   [SearchParamsEnum.SEARCH]: z.string().optional().default(""),
   [SearchParamsEnum.PAGE]: z.coerce.number().int().positive().default(1),
   [SearchParamsEnum.PER_PAGE]: z.coerce.number().int().positive().default(10),
-  [SearchParamsEnum.CATEGORY]: z.string().optional().default(""),
+  // [SearchParamsEnum.CATEGORY]: z.enum(["plumber", "electrical", "carpentors"]).optional(),
+  [SearchParamsEnum.CATEGORY]: z.union([
+    z.array(z.enum(["plumber", "electrical", "carpentors"])).optional(),
+    z.enum(["plumber", "electrical", "carpentors"]).optional(),
+  ]),
 });

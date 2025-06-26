@@ -1,13 +1,24 @@
+import { SearchParamsEnum } from "@/lib/resource";
 import { TMaterialInput, TSearchParams } from "@/lib/types";
 
 export const fetchInventory = async (
- {page,per_page,search}:TSearchParams
+ {page,per_page,search,category}:TSearchParams
 ): Promise<unknown> => {
   try {
     const url = new URLSearchParams({});
     if(page) url.set("page",page?.toString());
     if(per_page) url.set("perPage",per_page?.toString());
     if(search)  url.set("search", search?.toString());
+    if(category) {
+
+      if(typeof category === "string") url.set(SearchParamsEnum.CATEGORY, category);
+      
+      if(Array.isArray(category)) {
+        category.forEach(each => {
+          url.append(SearchParamsEnum.CATEGORY,each)
+        })
+      }
+    } 
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/materials?${url?.toString()}`,

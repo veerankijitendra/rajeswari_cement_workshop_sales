@@ -20,12 +20,12 @@ const Inventory: React.FC = async (props: {
 
   const parsedData = searchParamsSchema.safeParse(searchParams);
 
-  if (!parsedData.success) redirect("/inventory");
+  if (!parsedData.success)  redirect("/inventory");
   const { page, per_page, search, category } = parsedData.data;
 
   try {
     await queryClient.prefetchQuery({
-      queryKey: ["inventory", search, page, per_page],
+      queryKey: ["inventory", search, page, per_page, category],
       queryFn: () => fetchInventory(parsedData.data),
     });
 
