@@ -89,8 +89,7 @@ const MaterialList = ({ reset, getValues }: IProps) => {
       },
     });
 
-  console.log("data===>", { data, hasNextPage, isFetchingNextPage, status });
-  useEffect(() => {
+    useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
 
