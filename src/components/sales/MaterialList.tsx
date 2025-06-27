@@ -74,7 +74,7 @@ interface IProps {
 const MaterialList = ({ reset, getValues }: IProps) => {
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
+  const { data, fetchNextPage, hasNextPage } =
     useInfiniteQuery({
       queryKey: ["materials"],
       queryFn: async ({ pageParam = 1 }) =>

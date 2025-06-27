@@ -123,3 +123,5 @@ export const searchParamsSchema = z.object({
     z.enum(["plumber", "electrical", "carpentors"]).optional(),
   ]),
 });
+
+export const staleTime = 1 * 60 * 60 * 1000;

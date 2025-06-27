@@ -5,7 +5,7 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
-import { searchParamsSchema } from "@/lib/resource";
+import { searchParamsSchema, staleTime } from "@/lib/resource";
 import { redirect } from "next/navigation";
 import { fetchSales } from "./fetchSales";
 
@@ -22,6 +22,7 @@ const SalesPage = async (params: { searchParams: Promise<TSearchParams> }) => {
     await queryClient.prefetchQuery({
       queryKey: ["sales",page,per_page,search, category],
       queryFn: () => fetchSales(parsedData.data),
+      staleTime,
     });
     dehydratedData = dehydrate(queryClient);
   } catch (error) {

@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import InventoryPage from "@/components/inventory/InventoryPage";
 import { fetchInventory } from "./fetchInventory";
-import { searchParamsSchema } from "@/lib/resource";
+import { searchParamsSchema, staleTime } from "@/lib/resource";
 import { TSearchParams } from "@/lib/types";
 
 import { redirect } from "next/navigation";
@@ -27,6 +27,7 @@ const Inventory: React.FC = async (props: {
     await queryClient.prefetchQuery({
       queryKey: ["inventory", search, page, per_page, category],
       queryFn: () => fetchInventory(parsedData.data),
+      staleTime
     });
 
     dehydratedState = dehydrate(queryClient);

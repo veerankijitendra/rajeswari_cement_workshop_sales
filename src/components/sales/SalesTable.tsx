@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useDeferredValue, useEffect, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import {
   Table,
   TableHead,
@@ -13,11 +13,11 @@ import Pagination from "../home/Pagination";
 import { TSalesResponse, TSearchParams } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSales } from "@/app/sales/fetchSales";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import Loading from "../Loader";
-import { SearchParamsEnum } from "@/lib/resource";
+import { SearchParamsEnum, staleTime } from "@/lib/resource";
 import useDebounce from "@/hooks/useDebounce";
 interface IProps extends TSearchParams {
   data?: unknown;
@@ -26,20 +26,9 @@ interface IProps extends TSearchParams {
 
 const SalesTable = ({ page, per_page, search: query, category }: IProps) => {
   const [search, setSearch] = useState(query ? query : "");
-  const searchParams = useSearchParams()
-  const differedValue = useDeferredValue(search);
   const [,startTransition] = useTransition()
 
   const router = useRouter();
-
-  // useEffect(() =>{
-  //   const params = new URLSearchParams(searchParams?.toString());
-  //   params.set(SearchParamsEnum.SEARCH, differedValue)
-
-  //   router.replace("/sales?"+params.toString())
-
-  // },[differedValue])
-
 
 
   const {
@@ -50,6 +39,8 @@ const SalesTable = ({ page, per_page, search: query, category }: IProps) => {
   } = useQuery({
     queryKey: ["sales", page, per_page, query],
     queryFn: () => fetchSales({ page, per_page, search: query, category }),
+    staleTime,
+    
   });
 
   const debounce = useDebounce(search)
