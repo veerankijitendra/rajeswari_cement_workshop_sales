@@ -21,7 +21,7 @@ export const fetchInventory = async (
     } 
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/materials?${url?.toString()}`,
+      `/api/materials?${url?.toString()}`,
       {
         method: "GET",
         // cache: "no-store",
@@ -45,7 +45,7 @@ export const postMaterial = async (data:{material:TMaterialInput,isEdit:boolean}
   const {material,isEdit} = data;
   try{
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/materials`,
+      `/api/materials`,
       {
         method: isEdit ? "PUT" : "POST",
         cache: "no-store",

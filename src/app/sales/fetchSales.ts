@@ -10,7 +10,7 @@ export const fetchSales = async (
     if(search)  url.set("search", search?.toString());
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/sales?${url?.toString()}`,
+      `/api/sales?${url?.toString()}`,
       {
         method: "GET",
         cache: "no-store",
@@ -26,6 +26,4 @@ export const fetchSales = async (
     console.error("Error", error);
     throw error;
   }
-
-  return "";
 };

@@ -5,7 +5,7 @@ interface ICreateSale {
 
 export const createUpdateSales = async ({ data, isEdit = false }: ICreateSale) => {
   try {
-    const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/sales`;
+    const url = `/api/sales`;
     const response = await fetch(url, {
       method: isEdit ? "PUT" : "POST",
       body: JSON.stringify(data),

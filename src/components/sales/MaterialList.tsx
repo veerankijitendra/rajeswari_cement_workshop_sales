@@ -27,7 +27,7 @@ const fetchMaterial = async ({
     if (per_page) url.set(SearchParamsEnum.PER_PAGE, per_page?.toString());
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/materials?${url?.toString()}`,
+      `/api/materials?${url?.toString()}`,
       {
         method: "GET",
       }
