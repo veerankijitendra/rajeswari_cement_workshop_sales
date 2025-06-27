@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { MaterailEnum, salesSchema, materialSchema } from "@/lib/resource";
+import { MaterailEnum, salesSchema, materialSchema, } from "@/lib/resource";
 import { z } from "zod";
 
 import MaterialList from "./MaterialList";
-import { TSalesInput } from "@/lib/types";
+import { TSalesInput, TMaterialInput } from "@/lib/types";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useModelStore } from "@/lib/store/material";
@@ -35,7 +35,11 @@ const refinedMaterialSchema = materialSchema.merge(refinedSalesSchema);
 
 type TSales = z.infer<typeof refinedMaterialSchema>;
 
-const SalesForm: React.FC = () => {
+interface IProps  {
+  material?: TMaterialInput
+}
+
+const SalesForm: React.FC<IProps> = ({material}) => {
   const {
     register,
     handleSubmit,
@@ -45,6 +49,7 @@ const SalesForm: React.FC = () => {
     setError,
   } = useForm<TSales>({
     resolver: zodResolver(refinedMaterialSchema),
+    defaultValues: material
   });
 
   const queryClient = useQueryClient()

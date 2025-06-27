@@ -9,10 +9,17 @@ import Modal from "../home/Modal";
 import { TMaterialResponse, TSearchParams } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { fetchInventory } from "@/app/inventory/fetchInventory";
-import { ArrowLeftIcon, } from "lucide-react";
+import { ArrowLeftIcon, Plus, FunnelX } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Loading from "../Loader";
-import { staleTime } from "@/lib/resource";
+import useResize from "@/hooks/useResize";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import useFilterClear from "@/hooks/useFilterClear";
+import { staleTime } from "@/lib/utils";
 interface IProps extends TSearchParams {
   data?: unknown;
 }
@@ -25,11 +32,18 @@ function updateMaterialStore(data: unknown) {
   }
 }
 
-const InventoryPage: React.FC<IProps> = ({ search, page, per_page, category }) => {
+const InventoryPage: React.FC<IProps> = ({
+  search,
+  page,
+  per_page,
+  category,
+}) => {
   const content = useModelStore((state) => state.content);
   const openModel = useModelStore((state) => state.openModel);
   const closeModel = useModelStore((state) => state.closeModel);
-  const open = useModelStore(state => state.open)
+  const open = useModelStore((state) => state.open);
+  const isMobileScreen = useResize();
+  const { isFilterApplied, resetFilters } = useFilterClear();
   const router = useRouter();
 
   const { data, isLoading, isFetching, isRefetching } = useQuery({
@@ -56,14 +70,41 @@ const InventoryPage: React.FC<IProps> = ({ search, page, per_page, category }) =
       <div className="p-2 w-full overflow-x-clip flex flex-col">
         <div className="flex gap-4 items-center py-4 justify-between flex-wrap">
           <div className="flex items-center gap-4 justify-between">
-            <Button variant={"outline"} onClick={handleBack}>
-              <ArrowLeftIcon size={24} />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button variant={"outline"} onClick={handleBack}>
+                  <ArrowLeftIcon size={24} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Back to home.</TooltipContent>
+            </Tooltip>
+
             <h1 className="text-xl sm:text-3xl font-bold">Material</h1>
           </div>
-          <Button className="btn-secondary" onClick={handleNewItem}>
-            Add New Item
-          </Button>
+          <div className="flex gap-2">
+            {isFilterApplied && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button className="btn-primary" onClick={resetFilters}>
+                    {isMobileScreen ? (
+                      <FunnelX className="text-cyprus" />
+                    ) : (
+                      "Clear"
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Clear Filter</TooltipContent>
+              </Tooltip>
+            )}
+            <Tooltip>
+              <TooltipTrigger>
+                <Button className="btn-secondary" onClick={handleNewItem}>
+                  {isMobileScreen ? <Plus size={16} /> : "Add New Item"}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Add New Item</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
         {!(isLoading || isFetching || isRefetching) && <InventoryTable />}
         <div className="grow">{(isFetching || isLoading) && <Loading />}</div>

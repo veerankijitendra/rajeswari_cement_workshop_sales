@@ -36,8 +36,7 @@ import {
   
 } from "../ui/menubar";
 import { Input } from "../ui/input";
-
-const category =  ["plumber", "electrical", "carpentors"]
+import { categoriesDisplayList } from "@/lib/utils";
 
 const columns: ColumnDef<TMaterialInput>[] = [
   { accessorKey: MaterailEnum.MATERIAL_NAME, header: "Material Name" },
@@ -139,7 +138,7 @@ export default function InventoryTable() {
         updateContent(<NewMaterialForm material={rowData ? rowData : null} />);
       }
       if (buttonType === "sell") {
-        updateContent(<SalesForm />);
+        updateContent(<SalesForm material={rowData ? rowData : null} />);
       }
     }
   };
@@ -215,8 +214,8 @@ export default function InventoryTable() {
           {name === "Category" ? (
             <MenubarContent className="min-w-fit" onCloseAutoFocus={handleClosAutoFocus}>
               <MenubarGroup>
-                {category.map(cat => <MenubarCheckboxItem  onSelect={(e) => e.preventDefault()} checked={selectedCategory.includes(cat)} onCheckedChange={handleCheckBox(cat)} key={cat}>
-                  {cat}
+                {categoriesDisplayList.map(cat => <MenubarCheckboxItem  onSelect={(e) => e.preventDefault()} checked={selectedCategory.includes(cat.value)} onCheckedChange={handleCheckBox(cat.value)} key={cat.value}>
+                  {cat.name}
                   </MenubarCheckboxItem>)}
               </MenubarGroup>
             </MenubarContent>

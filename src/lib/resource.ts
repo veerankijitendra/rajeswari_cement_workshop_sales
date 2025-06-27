@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { categoriesList } from "./utils";
 
 export enum MaterailEnum {
   MATERIAL_NAME = "materialName",
@@ -117,11 +118,8 @@ export const searchParamsSchema = z.object({
   [SearchParamsEnum.SEARCH]: z.string().optional().default(""),
   [SearchParamsEnum.PAGE]: z.coerce.number().int().positive().default(1),
   [SearchParamsEnum.PER_PAGE]: z.coerce.number().int().positive().default(10),
-  // [SearchParamsEnum.CATEGORY]: z.enum(["plumber", "electrical", "carpentors"]).optional(),
   [SearchParamsEnum.CATEGORY]: z.union([
-    z.array(z.enum(["plumber", "electrical", "carpentors"])).optional(),
-    z.enum(["plumber", "electrical", "carpentors"]).optional(),
+    z.array(z.enum(categoriesList)).optional(),
+    z.enum(categoriesList).optional(),
   ]),
 });
-
-export const staleTime = 1 * 60 * 60 * 1000;

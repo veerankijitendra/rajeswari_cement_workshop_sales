@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { toast } from "sonner"
+import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,8 @@ import { MaterailEnum, materialSchema } from "@/lib/resource";
 import { TFormMaterialInput } from "@/lib/types";
 import { Button } from "../ui/button";
 import { postMaterial } from "@/app/inventory/fetchInventory";
-import {useModelStore} from "@/lib/store/material"
+import { useModelStore } from "@/lib/store/material";
+import { categoriesDisplayList } from "@/lib/utils";
 
 const initialState: TFormMaterialInput = {
   [MaterailEnum.MATERIAL_NAME]: "",
@@ -19,38 +20,38 @@ const initialState: TFormMaterialInput = {
   [MaterailEnum.STOCK]: "",
   [MaterailEnum.STOCK_UNITS]: "meters",
   [MaterailEnum.CATEGORY]: "plumber",
-  
 };
 
 interface IProps {
-    material?: TFormMaterialInput | null;
+  material?: TFormMaterialInput | null;
 }
 
-export default function NewMaterialForm({material}: IProps) {
-  const [form, setForm] = useState<TFormMaterialInput>(!!material ? material : initialState);
+export default function NewMaterialForm({ material }: IProps) {
+  const [form, setForm] = useState<TFormMaterialInput>(
+    !!material ? material : initialState
+  );
   const [errors, setErrors] = useState<
     Partial<Record<keyof TFormMaterialInput, string>>
   >({});
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
-  const closeModel = useModelStore((state) => state.closeModel)
+  const closeModel = useModelStore((state) => state.closeModel);
 
   const mutation = useMutation({
     mutationFn: postMaterial,
     onSuccess: () => {
-      closeModel()
-      queryClient.invalidateQueries({queryKey: ["inventory"],})
+      closeModel();
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
 
-      useModelStore.setState({open: false, content: null})
+      useModelStore.setState({ open: false, content: null });
       setForm(initialState);
-      toast.success("Material added successfully!",{position:"top-center"})
-
+      toast.success("Material added successfully!", { position: "top-center" });
     },
     onError: () => {
-      toast.error("Failed", {position:"top-center"})
-    }
-  })
+      toast.error("Failed", { position: "top-center" });
+    },
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -62,7 +63,7 @@ export default function NewMaterialForm({material}: IProps) {
     }));
   };
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = materialSchema.safeParse(form);
     if (!result.success) {
@@ -76,9 +77,7 @@ export default function NewMaterialForm({material}: IProps) {
     }
     setErrors({});
 
-    mutation.mutate({material:form, isEdit:!!material})
-
-
+    mutation.mutate({ material: form, isEdit: !!material });
   };
 
   return (
@@ -153,7 +152,6 @@ export default function NewMaterialForm({material}: IProps) {
           name="stockUnits"
           value={form.stockUnits}
           onChange={handleChange}
-          
           required
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
@@ -174,18 +172,17 @@ export default function NewMaterialForm({material}: IProps) {
           required
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="plumber">Plumber</option>
-          <option value="electrical">Electrical</option>
-          <option value="carpentors">Carpentors</option>
+          {categoriesDisplayList.map((category) => (
+            <option key={category.value} value={category.value}>
+              {category.name}
+            </option>
+          ))}
         </select>
         {errors.category && (
           <span className="text-red-500 text-sm">{errors.category}</span>
         )}
       </div>
-      <Button
-        type="submit"
-        className="btn-secondary"
-      >
+      <Button type="submit" className="btn-secondary">
         {!!material ? "Edit" : "Add"} Material
       </Button>
     </form>

@@ -5,9 +5,10 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
-import { searchParamsSchema, staleTime } from "@/lib/resource";
+import { searchParamsSchema } from "@/lib/resource";
 import { redirect } from "next/navigation";
 import { fetchSales } from "./fetchSales";
+import { staleTime } from "@/lib/utils";
 
 const SalesPage = async (params: { searchParams: Promise<TSearchParams> }) => {
   const queryClient = new QueryClient();

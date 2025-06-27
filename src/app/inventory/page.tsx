@@ -6,10 +6,11 @@ import {
 } from "@tanstack/react-query";
 import InventoryPage from "@/components/inventory/InventoryPage";
 import { fetchInventory } from "./fetchInventory";
-import { searchParamsSchema, staleTime } from "@/lib/resource";
+import { searchParamsSchema } from "@/lib/resource";
 import { TSearchParams } from "@/lib/types";
 
 import { redirect } from "next/navigation";
+import { staleTime } from "@/lib/utils";
 
 const Inventory: React.FC = async (props: {
   searchParams?: Promise<TSearchParams>;

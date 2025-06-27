@@ -27,7 +27,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
                         {title}
                     </div>
                 )}
-                <div className="h-auto overflow-auto">{children}</div>
+                <div className="max-h-svh h-auto overflow-auto">{children}</div>
             </div>
         </div>
     );

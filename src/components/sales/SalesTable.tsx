@@ -14,11 +14,15 @@ import { TSalesResponse, TSearchParams } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSales } from "@/app/sales/fetchSales";
 import { useRouter } from "next/navigation";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, FunnelX } from "lucide-react";
 import { Button } from "../ui/button";
 import Loading from "../Loader";
-import { SearchParamsEnum, staleTime } from "@/lib/resource";
+import { SearchParamsEnum } from "@/lib/resource";
 import useDebounce from "@/hooks/useDebounce";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import useResize from "@/hooks/useResize";
+import useFilterClear from "@/hooks/useFilterClear";
+import { staleTime } from "@/lib/utils";
 interface IProps extends TSearchParams {
   data?: unknown;
 }
@@ -27,7 +31,8 @@ interface IProps extends TSearchParams {
 const SalesTable = ({ page, per_page, search: query, category }: IProps) => {
   const [search, setSearch] = useState(query ? query : "");
   const [,startTransition] = useTransition()
-
+  const isMobileScreen = useResize();
+  const { isFilterApplied, resetFilters } = useFilterClear();
   const router = useRouter();
 
 
@@ -61,6 +66,10 @@ const SalesTable = ({ page, per_page, search: query, category }: IProps) => {
     })
   },[debounce])
 
+  useEffect(() => {
+    setSearch(query)
+  },[query])
+
   const updateURL = (newSearch: string, newPage: number) => {
     const params = new URLSearchParams();
     if (newSearch) params.set("search", newSearch)
@@ -83,13 +92,30 @@ const SalesTable = ({ page, per_page, search: query, category }: IProps) => {
             </Button>
             <h1 className="text-xl sm:text-3xl font-bold">Sales History</h1>
           </div>
+          <div className="flex gap-2 items-center">
+            {isFilterApplied && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button className="btn-primary" onClick={resetFilters}>
+                    {isMobileScreen ? (
+                      <FunnelX className="text-cyprus" />
+                    ) : (
+                      "Clear"
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Clear Filter</TooltipContent>
+              </Tooltip>
+            )}
+
           <Input
             type="text"
             placeholder="Search Material Name"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-64"
-          />
+            />
+            </div>
         </div>
         {isLoading || isFetching || isRefetching ? (
           <div className="w-full">
