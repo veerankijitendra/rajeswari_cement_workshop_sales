@@ -3,154 +3,98 @@
 import React from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  FormItem,
-} from "@/components/ui/form";
+import { FormItem } from "@/components/ui/form";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {  TMaterialInput } from "@/lib/types";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { MaterailEnum, salesSchema, materialSchema } from "@/lib/resource";
 import { z } from "zod";
 
+import MaterialList from "./MaterialList";
+import { TSalesInput } from "@/lib/types";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useModelStore } from "@/lib/store/material";
+import { toast } from "sonner";
+import { createUpdateSales } from "./fetchSales";
+
 const refinedSalesSchema = salesSchema.pick({
   [MaterailEnum.QUANTITY]: true,
 });
 
-
-
-const refinedMaterialSchema = materialSchema.merge(refinedSalesSchema)
+const refinedMaterialSchema = materialSchema.merge(refinedSalesSchema);
 
 type TSales = z.infer<typeof refinedMaterialSchema>;
 
-
-const materialsList = [
-  {
-    materialName: "LED Strip",
-    price: "450",
-    sellPrice: "500",
-    stock: "55",
-    stockUnits: "meters",
-    category: "electrical",
-    id: "685555242f4b8ce4e10a0399",
-  },
-  {
-    materialName: "Chisel Set",
-    price: "290",
-    sellPrice: "350",
-    stock: "15",
-    stockUnits: "units",
-    category: "carpentors",
-    id: "685555242f4b8ce4e10a0394",
-  },
-  {
-    materialName: "Shower Head",
-    price: "220",
-    sellPrice: "270",
-    stock: "36",
-    stockUnits: "units",
-    category: "plumber",
-    id: "685555242f4b8ce4e10a0398",
-  },
-  {
-    materialName: "Laminated Board",
-    price: "670",
-    sellPrice: "750",
-    stock: "28",
-    stockUnits: "units",
-    category: "carpentors",
-    id: "685555242f4b8ce4e10a0397",
-  },
-  {
-    materialName: "Extension Cord",
-    price: "230",
-    sellPrice: "280",
-    stock: "47",
-    stockUnits: "units",
-    category: "electrical",
-    id: "685555242f4b8ce4e10a0396",
-  },
-  {
-    materialName: "Ball Valve",
-    price: "110",
-    sellPrice: "140",
-    stock: "65",
-    stockUnits: "units",
-    category: "plumber",
-    id: "685555242f4b8ce4e10a0395",
-  },
-  {
-    materialName: "PVC Reducer",
-    price: "60",
-    sellPrice: "80",
-    stock: "90",
-    stockUnits: "units",
-    category: "plumber",
-    id: "685555242f4b8ce4e10a0392",
-  },
-  {
-    materialName: "Electric Tester",
-    price: "100",
-    sellPrice: "130",
-    stock: "75",
-    stockUnits: "units",
-    category: "electrical",
-    id: "685555242f4b8ce4e10a0393",
-  },
-  {
-    materialName: "Hammer",
-    price: "320",
-    sellPrice: "400",
-    stock: "20",
-    stockUnits: "units",
-    category: "carpentors",
-    id: "685555242f4b8ce4e10a0391",
-  },
-  {
-    materialName: "Bulb Holder",
-    price: "45",
-    sellPrice: "60",
-    stock: "220",
-    stockUnits: "units",
-    category: "electrical",
-    id: "685555242f4b8ce4e10a038d",
-  },
-];
-
-
 const SalesForm: React.FC = () => {
-  const { register, handleSubmit, reset, getValues, formState: {errors} } = useForm<TSales>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    formState: { errors },
+    setError,
+  } = useForm<TSales>({
     resolver: zodResolver(refinedMaterialSchema),
   });
 
+  const queryClient = useQueryClient()
+  const closeModel = useModelStore((state) => state.closeModel);
 
-  const error = () => Object.values(errors).length > 0 ? Object.values(errors)[0]?.message : ""
+  const error = () =>
+    Object.values(errors).length > 0 ? Object.values(errors)[0]?.message : "";
+
+  const {mutate, isPending} = useMutation({
+    mutationKey: ["sales"],
+    mutationFn: createUpdateSales,
+    onSuccess: () => {
+      closeModel();
+      queryClient.invalidateQueries({queryKey: ["inventory"],})
+      reset();
+      toast.success("Sales updated successfully!",{position:"top-center"})
+    },
+    onError: (error) => {
+      toast.error("Sales creation failed"+JSON.stringify(error), { position: "top-center" });
+    },
+  });
+
+  const onSubmit = (data: TSales) => {
+    const { stock, quantity, id, price, sellPrice } = data;
+
+    if (+quantity > +stock) {
+      return setError("quantity", {
+        message: `Qauntity is too high! \n please select the qauntity below the ${stock}.`,
+      });
+    }
+
+    if (!id) return setError("root", { message: "Please select the material" });
+    const inputData: TSalesInput = {
+      materialId: id,
+      price,
+      quantity,
+      sellPrice,
+    };
+
+    mutate({data: inputData,isEdit: false})
+    
+  };
 
   return (
     <div className="h-full sm:h-auto overflow-auto p-4">
       <form
         className="grid grid-cols-1 gap-4 relative"
-        onSubmit={handleSubmit(() => {})}
+        onSubmit={handleSubmit(onSubmit)}
       >
-        {/* <X size={16} className="absolute right-1 top-1 text-sm" /> */}
-        <h1 className="text-2xl font-semibold underline underline-offset-2">
+        <h1 className="text-2xl font-semibold underline underline-offset-2 text-cyprus">
           Sales Form
         </h1>
         {error() && (
@@ -159,7 +103,7 @@ const SalesForm: React.FC = () => {
           </div>
         )}
         <FormItem className="grid grid-cols-1 gap-2 ">
-          <Label>Material</Label>
+          <Label className="text-cyprus">Material</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -177,46 +121,12 @@ const SalesForm: React.FC = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent>
-              <Command>
-                <CommandInput
-                  placeholder="Search materials..."
-                  className="h-9"
-                />
-                <CommandList>
-                  <CommandEmpty>No Materails Found</CommandEmpty>
-                  <CommandGroup>
-                    {materialsList.map((material) => (
-                      <CommandItem
-                        key={material.id}
-                        value={material.materialName}
-                        onSelect={() => {
-                          reset({
-                            ...(material as TMaterialInput),
-                            quantity: "1",
-                          });
-                        }}
-                      >
-                        {material.materialName} - {material.price}{" "}
-                        {material.stockUnits}
-                        <Check
-                          className={cn(
-                            "ml-auto",
-                            material.materialName ===
-                              getValues()?.[MaterailEnum.MATERIAL_NAME]
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
+              <MaterialList reset={reset} getValues={getValues} />
             </PopoverContent>
           </Popover>
         </FormItem>
         <div className="grid grid-cols-1 gap-2 ">
-          <Label>Quantity</Label>
+          <Label className="text-cyprus">Quantity</Label>
           <Input
             // type="number"
             {...register(MaterailEnum.QUANTITY)}
@@ -225,7 +135,7 @@ const SalesForm: React.FC = () => {
           />
         </div>
         <div className="grid grid-cols-1 gap-2 ">
-          <Label>Price</Label>
+          <Label className="text-cyprus">Price</Label>
           <Input
             {...register(MaterailEnum.PRICE)}
             className="text-muted-foreground"
@@ -234,14 +144,14 @@ const SalesForm: React.FC = () => {
           />
         </div>
         <div className="grid grid-cols-1 gap-2 ">
-          <Label>Sell Price</Label>
+          <Label className="text-cyprus">Sell Price</Label>
           <Input
             {...register(MaterailEnum.SELL_PRICE)}
             placeholder="Sell Price"
           />
         </div>
         <div className="grid grid-cols-1 gap-2 ">
-          <Label>Stock</Label>
+          <Label className="text-cyprus">Stock</Label>
           <Input
             {...register(MaterailEnum.STOCK)}
             className="text-muted-foreground"
@@ -249,7 +159,7 @@ const SalesForm: React.FC = () => {
             placeholder="Stock"
           />
         </div>
-        <Button className="" type="submit">
+        <Button disabled={isPending} className="btn-secondary" type="submit">
           Submit
         </Button>
       </form>

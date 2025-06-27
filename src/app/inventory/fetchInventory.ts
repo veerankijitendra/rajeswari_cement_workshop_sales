@@ -6,9 +6,9 @@ export const fetchInventory = async (
 ): Promise<unknown> => {
   try {
     const url = new URLSearchParams({});
-    if(page) url.set("page",page?.toString());
-    if(per_page) url.set("perPage",per_page?.toString());
-    if(search)  url.set("search", search?.toString());
+    if(page) url.set(SearchParamsEnum.PAGE,page?.toString());
+    if(per_page) url.set(SearchParamsEnum.PER_PAGE,per_page?.toString());
+    if(search)  url.set(SearchParamsEnum.SEARCH, search?.toString());
     if(category) {
 
       if(typeof category === "string") url.set(SearchParamsEnum.CATEGORY, category);
@@ -24,7 +24,7 @@ export const fetchInventory = async (
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/materials?${url?.toString()}`,
       {
         method: "GET",
-        cache: "no-store",
+        // cache: "no-store",
       }
     );
     if (!response.ok) {

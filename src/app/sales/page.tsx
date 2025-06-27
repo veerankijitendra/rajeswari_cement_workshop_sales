@@ -18,9 +18,9 @@ const SalesPage = async (params: { searchParams: Promise<TSearchParams> }) => {
   if (!parsedData.success) redirect("/sales");
 
   try {
-    const { page, per_page, search } = parsedData.data;
+    const { page, per_page, search, category } = parsedData.data;
     await queryClient.prefetchQuery({
-      queryKey: ["sales",page,per_page,search],
+      queryKey: ["sales",page,per_page,search, category],
       queryFn: () => fetchSales(parsedData.data),
     });
     dehydratedData = dehydrate(queryClient);
