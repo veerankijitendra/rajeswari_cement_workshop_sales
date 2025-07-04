@@ -11,7 +11,6 @@ import {
 // Helper to generate page numbers with dots if needed
 function getPaginationRange(page: number, pageCount: number): (number | string)[] {
   const totalNumbers = 5; // how many page numbers to show (excluding dots)
-  const totalBlocks = totalNumbers + 2; // including first and last
   // If there are few pages, show all
   if (pageCount <= totalNumbers) {
     return Array.from({ length: pageCount }, (_, i) => i + 1);
