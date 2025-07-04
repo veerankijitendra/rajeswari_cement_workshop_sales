@@ -59,7 +59,7 @@ export const materialSchema = z
       required_error: "Stock units required",
       invalid_type_error: "Please select the valid stock.",
     }),
-    [MaterailEnum.CATEGORY]: z.enum(["plumber", "electrical", "carpentors"], {
+    [MaterailEnum.CATEGORY]: z.enum(categoriesList, {
       required_error: "Category is required.",
       invalid_type_error: "Invalid category.",
     }),

@@ -39,5 +39,4 @@ export const categoriesDisplayList: {value: typeof categoriesList[number], name:
     name: 'Sanitary And Fittings',
     value: "sanitary_and_fittings"
   }
-
 ]

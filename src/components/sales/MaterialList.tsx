@@ -55,7 +55,7 @@ interface IProps {
     sellPrice: string | number;
     stock: string | number;
     stockUnits: "meters" | "units";
-    category: "plumber" | "electrical" | "carpentors";
+    category: "plumber" | "electrical" | "carpentors" | "c.p.v.c_pipe_and_fittings" | "u.p.v.c_pipe_and_fittings" | "g.i_fittings" | "sanitary_and_fittings";
     quantity: string;
     id?: string | undefined;
 }>;
@@ -65,7 +65,7 @@ interface IProps {
     sellPrice: string | number;
     stock: string | number;
     stockUnits: "meters" | "units";
-    category: "plumber" | "electrical" | "carpentors";
+    category: "plumber" | "electrical" | "carpentors" | "c.p.v.c_pipe_and_fittings" | "u.p.v.c_pipe_and_fittings" | "g.i_fittings" | "sanitary_and_fittings";
     quantity: string;
     id?: string | undefined;
 }>;

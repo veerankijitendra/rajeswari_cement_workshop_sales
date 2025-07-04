@@ -7,6 +7,7 @@ import {Inter} from "next/font/google"
 const font = Inter({
   weight: ['400', "500", "600", "700", "800",],
   subsets: ['latin'],
+   display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${font.className} bg-gray-100`}>
+      <body className={`${font.className} bg-background-500`}>
         <Providers>
           <div className="max-w-6xl mx-auto w-full">
             {children}
