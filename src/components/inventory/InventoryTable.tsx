@@ -1,6 +1,6 @@
 "use client";
 import "@/app/table-custom.css";
-import React, { useEffect, useRef, useState,} from "react";
+import React, { ReactNode, useEffect, useRef, useState,} from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   Table,
@@ -247,6 +247,12 @@ export default function InventoryTable() {
     );
   };
 
+  const getCategoryName = (flex: ReactNode,value: unknown) => {
+    const result = categoriesDisplayList.find(each => each.value === value);
+    if(!result) return flex;
+    return result.name
+  }
+
   return (
     <div className="flex flex-col gap-2 justify-between h-full">
       <Modal isOpen={open} onClose={closeModel}>
@@ -288,17 +294,16 @@ export default function InventoryTable() {
                     MaterailEnum.TOTAL_PRICE,
                    // @ts-expect-error - this value might be undefined in edge cases
                   ].includes(cell.column.columnDef.accessorKey);
-
                   return (
                     <TableCell
                       key={cell.id}
                       data-object-id={JSON.stringify(cell.row.original)}
                     >
                       {`${isPrice ? "₹" : ""}`}
-                      {flexRender(
+                      {getCategoryName(flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
-                      )}
+                      ),cell.getContext().renderValue())}
                     </TableCell>
                   );
                 })}

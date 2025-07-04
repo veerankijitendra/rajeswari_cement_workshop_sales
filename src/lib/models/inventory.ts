@@ -1,6 +1,7 @@
 import { Schema, model, models } from "mongoose";
 import { IMaterial } from "../types";
 import { MaterailEnum } from "../resource";
+import { categoriesList } from "../utils";
 
 
 const MaterialSchema = new Schema({
@@ -32,7 +33,7 @@ const MaterialSchema = new Schema({
     },
     [MaterailEnum.CATEGORY]: {
         type: String,
-        enum: ["plumber", "electrical", "carpentors"],
+        enum: categoriesList,
         required: true,
     },
 
